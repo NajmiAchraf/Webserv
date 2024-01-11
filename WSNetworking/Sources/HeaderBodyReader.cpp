@@ -52,10 +52,7 @@ void HeaderBodyReader::header_reading() {
 	}
 }
 
-void HeaderBodyReader::throw_still_running() {
-	this->close_body_file();
-	throw std::runtime_error("Still running");
-}
+void HeaderBodyReader::throw_still_running() { throw std::runtime_error("Still running"); }
 
 string HeaderBodyReader::generate_random_file_name() {
 	std::stringstream ss;
@@ -88,6 +85,7 @@ void HeaderBodyReader::open_body_file() {
 void HeaderBodyReader::close_body_file() {
 	if (this->outFile.is_open()) {
 		this->outFile.eof();
+		this->outFile.flush();
 		this->outFile.close();
 	}
 }
@@ -104,9 +102,6 @@ int HeaderBodyReader::receive_data(int size) {
 
 	// Write data to the file
 	this->outFile.write(buffer, bytes);
-	this->outFile.flush();
-
-	this->close_body_file();
 	return bytes;
 }
 
@@ -245,8 +240,6 @@ void HeaderBodyReader::chunked_body_reading() {
 
 	else
 		this->chunked_body();
-
-	this->close_body_file();
 }
 
 void HeaderBodyReader::chunked_body_from_header() {
